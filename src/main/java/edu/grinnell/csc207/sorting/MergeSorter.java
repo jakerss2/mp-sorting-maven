@@ -55,6 +55,52 @@ public class MergeSorter<T> implements Sorter<T> {
    */
   @Override
   public void sort(T[] values) {
-    // STUB
+    merge(values, 0, values.length - 1);
   } // sort(T[])
+
+  public void merge(T[] values, int lb, int ub) {
+    if (lb < ub) {
+      int midpoint = lb + (ub - lb) / 2;
+
+      merge(values, lb, midpoint);
+      merge(values, midpoint + 1, ub);
+
+      mergeHelper(values, lb, midpoint, ub);
+    }
+  }
+
+  public void mergeHelper(T[] values, int lb, int m, int ub) {
+    int sizeLeft = m - lb + 1;
+    int sizeRight = ub - m;
+    T[] tmpLeft = (T[]) new Object[sizeLeft];
+    T[] tmpRight = (T[]) new Object[sizeRight];
+
+    for (int i = 0; i < sizeLeft; i++) { 
+      tmpLeft[i] = values[i + lb];
+    }
+    for (int i = 0; i < sizeRight; i++) {
+      tmpRight[i] = values[m + 1 + i];
+    }
+
+    int i = 0;
+    int j = 0;
+    int k = lb;
+
+    while (i < sizeLeft && j < sizeRight) {
+      int comp = order.compare(tmpLeft[i], tmpRight[j]);
+      if (comp <= 0) {
+        values[k++] = tmpLeft[i++];
+      } else {
+        values[k++] = tmpRight[j++];
+      }
+    }
+
+    while (i < sizeLeft) {
+      values[k++] = tmpLeft[i++];
+    }
+
+    while (j < sizeRight) {
+      values[k++] = tmpRight[j++];
+    }
+  }
 } // class MergeSorter
