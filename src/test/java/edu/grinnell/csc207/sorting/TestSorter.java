@@ -1,16 +1,12 @@
 package edu.grinnell.csc207.sorting;
 
-import edu.grinnell.csc207.util.ArrayUtils;
-
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
+
+import edu.grinnell.csc207.util.ArrayUtils;
 
 /**
  * Tests of Sorter objects. Please do not use this class directly.
@@ -120,4 +116,90 @@ public class TestSorter {
     ArrayUtils.permute(original);
     assertSorts(expected, original, intSorter);
   } // permutedIntegers
+
+  /**
+   * Check when only the first and last element
+   * are needed to be switched.
+   */
+  @Test
+  public void firstLastSwitchedInt() {
+    if (null == intSorter) {
+      return;
+    } // if
+    Integer[] original = { 5, 2, 3, 4, 1 };
+    Integer[] expected = { 1, 2, 3, 4, 5 };
+    assertSorts(expected, original, intSorter);
+  } // firstLastSwitchedInt
+
+  /**
+   * Ensure it works when there is only one element
+   */
+  @Test
+  public void singletonInt() {
+    if (null == intSorter) {
+      return;
+    } // if
+    Integer[] original = { 1 };
+    Integer[] expected = { 1 };
+    assertSorts(expected, original, intSorter);
+  } // singletonInt
+
+  /**
+   * Ensure it works if first two elements are switched
+   */
+  @Test
+  public void firstTwoString() {
+    if (null == stringSorter) {
+      return;
+    } // if
+    String[] original = { "bravo", "alpha", "charlie", "delta", "foxtrot" };
+    String[] expected = { "alpha", "bravo", "charlie", "delta", "foxtrot" };
+    assertSorts(expected, original, stringSorter);
+  } // firstTwoString
+
+  /**
+   * Ensure it works if last two elements are switched
+   */
+  @Test
+  public void lastTwoString() {
+    if (null == stringSorter) {
+      return;
+    } // if
+    String[] original = { "alpha", "bravo", "charlie", "foxtrot", "delta" };
+    String[] expected = { "alpha", "bravo", "charlie", "delta", "foxtrot" };
+    assertSorts(expected, original, stringSorter);
+  } // firstTwoString
+
+  /**
+   * Ensure it stays the same if all are the same
+   */
+  @Test
+  public void allSameString() {
+    if (null == stringSorter) {
+      return;
+    } // if
+    String[] original = { "echo", "echo", "echo", "echo", "echo"};
+    String[] expected = { "echo", "echo", "echo", "echo", "echo"};
+    assertSorts(expected, original, stringSorter);
+  } // allSameString
+
+  @Test
+  public void someDuplicateInt() {
+    if (null == intSorter) {
+      return;
+    } // if
+    Integer[] original = { 1, 5, 3, 5, 5, 4, 2, 2 };
+    Integer[] expected = { 1, 2, 2, 3, 4, 5, 5, 5 };
+    assertSorts(expected, original, intSorter);
+  } // firstLastSwitchedInt
+
+  @Test
+  public void manyDuplicateInt() {
+    if (null == intSorter) {
+      return;
+    } // if
+    Integer[] original = { 1, 2, 1, 2, 2, 1, 2, 1 };
+    Integer[] expected = { 1, 1, 1, 1, 2, 2, 2, 2 };
+    assertSorts(expected, original, intSorter);
+  } // manyDuplicateInt
 } // class TestSorter
