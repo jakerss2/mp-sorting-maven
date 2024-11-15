@@ -26,7 +26,9 @@ I asked ChatGPT to give me the fastest sorting algorithms. It gave me about
 Once I got a grasp on what it was, I asked for it to take my implementation
 of merge and insertion sort and incorporate it to be something like TimSort.
 I then asked it to continue to optimize it, which started to include things
-like forkJoinPool. Overall, it was fairly helpful.
+like forkJoinPool. Overall, it was fairly helpful. After submitting, I
+tried to run time tests on my sort. I then realized it is extremely slow
+because it takes a lot more effort to call forkJoinPool
 
 ## Notes about my first submission for MP8
 
