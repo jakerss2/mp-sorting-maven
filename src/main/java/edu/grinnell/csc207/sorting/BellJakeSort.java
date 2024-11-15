@@ -45,7 +45,7 @@ public class BellJakeSort<T> implements Sorter<T> {
    */
   public BellJakeSort(Comparator<? super T> comparator) {
     this.order = comparator;
-    this.forkJoinPool = new ForkJoinPool();
+    this.forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());;
   } // InsertionSorter(Comparator)
 
   // +---------+-----------------------------------------------------
@@ -75,7 +75,7 @@ public class BellJakeSort<T> implements Sorter<T> {
       insertionSort(values, i, end);
     }
 
-    parallelMergeSort(values, 0, n - 1);
+    parallelMergeSort(values);
 } // sort([])
 
 
@@ -115,16 +115,19 @@ public class BellJakeSort<T> implements Sorter<T> {
    * @param left
    * @param right
    */
-  private void mergeSort(T[] values, int left, int right) {
-    if (left < right) {
-      int mid = left + (right - left) / 2;
+  private void mergeSort(T[] values) {
+    int n = values.length;
+    T[] temp = (T[]) new Object[n];
 
-      mergeSort(values, left, mid);
-      mergeSort(values, mid + 1, right);
-
-      merge(values, left, mid, right);
-    } // if
-  } // mergeSort(T[], int, int)
+    // Iteratively merge subarrays of increasing size
+    for (int size = 1; size < n; size *= 2) {
+      for (int left = 0; left < n - size; left += 2 * size) {
+        int mid = left + size - 1;
+        int right = Math.min(left + 2 * size - 1, n - 1);
+        merge(values, temp, left, mid, right);
+      } // for
+    } // for
+  } // mergeSort(T[])
 
   /**
    * Given an array, we move along to sides of an array
@@ -136,22 +139,16 @@ public class BellJakeSort<T> implements Sorter<T> {
    * @param mid
    * @param right
    */
-  private void merge(T[] values, int left, int mid, int right) {
-    int sizeLeft = mid - left + 1;
-    int sizeRight = right - mid;
-
-    T[] temp = (T[]) new Object[values.length];
-
-    System.arraycopy(values, left, temp, left, sizeLeft);
-    System.arraycopy(values, mid + 1, temp, mid + 1, sizeRight);
+  private void merge(T[] values, T[] temp, int left, int mid, int right) {
+    System.arraycopy(values, left, temp, left, right - left + 1);
 
     int i = left, j = mid + 1, k = left;
 
     while (i <= mid && j <= right) {
       if (order.compare(temp[i], temp[j]) <= 0) {
-          values[k++] = temp[i++];
+        values[k++] = temp[i++];
       } else {
-          values[k++] = temp[j++];
+        values[k++] = temp[j++];
       }
     }
 
@@ -164,7 +161,6 @@ public class BellJakeSort<T> implements Sorter<T> {
     }
   }
 
-
   /**
    * Merge sort that utilizes forkJoinPool
    * which allows multiple sortings to happen
@@ -173,42 +169,43 @@ public class BellJakeSort<T> implements Sorter<T> {
    * @param left
    * @param right
    */
-  private void parallelMergeSort(T[] values, int left, int right) {
-    if (right - left <= 1000) {
-        mergeSort(values, left, right);
+  private void parallelMergeSort(T[] values) {
+    int n = values.length;
+
+    if (n <= 1000) {
+        mergeSort(values);
     } else {
-        forkJoinPool.invoke(new MergeTask(values, left, right));
+        forkJoinPool.invoke(new MergeTask(values, 1, n));
     } // if/else
   } // parallelMergeSort(T[], int int)
 
   private class MergeTask extends RecursiveTask<Void> {
     private final T[] values;
-    private final int left;
-    private final int right;
+    private final int size;
+    private final int n;
 
-    public MergeTask(T[] values, int left, int right) {
+    public MergeTask(T[] values, int size, int n) {
       this.values = values;
-      this.left = left;
-      this.right = right;
+      this.size = size;
+      this.n = n;
     } // MergeTask(T[], int, int)
 
     @Override
     protected Void compute() {
-      int mid = left + (right - left) / 2;
-      MergeTask leftTask = new MergeTask(values, left, mid);
-      MergeTask rightTask = new MergeTask(values, mid + 1, right);
+      if (size >= n) {
+        return null;  // All merging is complete
+      }
 
-      // Fork the tasks
-      leftTask.fork();
-      rightTask.fork();
+      // Create parallel tasks for merging subarrays
+      invokeAll(new MergeTask(values, size * 2, n));
 
-      // Wait for both sides to finish
-      leftTask.join();
-      rightTask.join();
+      for (int left = 0; left < n - size; left += 2 * size) {
+        int mid = left + size - 1;
+        int right = Math.min(left + 2 * size - 1, n - 1);
+        merge(values, (T[]) new Object[n], left, mid, right);
+      }
 
-      // Merge results
-      merge(values, left, mid, right);
       return null;
-    } // compute() 
+    } // compute()
   } // MergeTask
 } // class BellJakeSort
