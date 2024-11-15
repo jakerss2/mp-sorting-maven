@@ -1,11 +1,9 @@
 package edu.grinnell.csc207.experiments;
 
-import edu.grinnell.csc207.sorting.Sorter;
-
 import java.io.PrintWriter;
-
 import java.util.Arrays;
-import java.util.Comparator;
+
+import edu.grinnell.csc207.sorting.Sorter;
 
 /**
  * Some tools for quick experiments with sorting routines.
@@ -27,7 +25,7 @@ public class SortExperiments {
    * @param sorter
    *   The sorter to use.
    */
-  public static <T> void oneExperiment(PrintWriter pen, T[] values, 
+  public static <T> void oneExperiment(PrintWriter pen, T[] values,
       Sorter<T> sorter) {
     pen.printf("sort(%s) -> ", Arrays.toString(values));
     pen.flush();

@@ -1,12 +1,10 @@
 package edu.grinnell.csc207.experiments;
 
+import java.io.PrintWriter;
+import java.util.Comparator;
+
 import edu.grinnell.csc207.sorting.Quicksorter;
 import edu.grinnell.csc207.sorting.Sorter;
-
-import java.io.PrintWriter;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Some quick experiments with Quicksort.
@@ -26,7 +24,7 @@ public class QuicksortExperiments {
    */
   public static void main(String[] args) {
     PrintWriter pen = new PrintWriter(System.out, true);
-    Comparator<Comparable> order = (x,y) -> x.compareTo(y);
+    Comparator<Comparable> order = (x, y) -> x.compareTo(y);
     Sorter<Comparable> sorter = new Quicksorter(order);
     SortExperiments.manyExperiments(pen, sorter);
     SortExperiments.oneExperiment(pen, args, sorter);

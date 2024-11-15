@@ -66,9 +66,9 @@ public class InsertionSorter<T> implements Sorter<T> {
           j--;
         } else {
           break;
-        }
-      }
+        } // if/else
+      } // while
     values[j + 1] = obj;
-    }
+    } // for
   } // sort(T[])
 } // class InsertionSorter

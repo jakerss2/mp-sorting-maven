@@ -71,8 +71,8 @@ public class BellJakeSort<T> implements Sorter<T> {
 
     // Use insertion sort on small "runs" within the array
     for (int i = 0; i < n; i += RUN_SIZE) {
-        int end = Math.min(i + RUN_SIZE - 1, n - 1);
-        insertionSort(values, i, end);
+      int end = Math.min(i + RUN_SIZE - 1, n - 1);
+      insertionSort(values, i, end);
     }
 
     parallelMergeSort(values, 0, n - 1);
@@ -93,14 +93,14 @@ public class BellJakeSort<T> implements Sorter<T> {
       T temp = values[i];
       int low = left, high = i - 1;
 
-    while (low <= high) {
-      int mid = low + (high - low) / 2;
-      if (order.compare(values[mid], temp) < 0) {
+      while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (order.compare(values[mid], temp) < 0) {
           low = mid + 1;
-      } else {
+        } else {
           high = mid - 1;
-      } // if/else
-    } // while
+        } // if/else
+      } // while
 
     System.arraycopy(values, low, values, low + 1, i - low);
     values[low] = temp;
@@ -117,12 +117,12 @@ public class BellJakeSort<T> implements Sorter<T> {
    */
   private void mergeSort(T[] values, int left, int right) {
     if (left < right) {
-        int mid = left + (right - left) / 2;
+      int mid = left + (right - left) / 2;
 
-        mergeSort(values, left, mid);
-        mergeSort(values, mid + 1, right);
+      mergeSort(values, left, mid);
+      mergeSort(values, mid + 1, right);
 
-        merge(values, left, mid, right);
+      merge(values, left, mid, right);
     } // if
   } // mergeSort(T[], int, int)
 
@@ -148,19 +148,19 @@ public class BellJakeSort<T> implements Sorter<T> {
     int i = left, j = mid + 1, k = left;
 
     while (i <= mid && j <= right) {
-        if (order.compare(temp[i], temp[j]) <= 0) {
-            values[k++] = temp[i++];
-        } else {
-            values[k++] = temp[j++];
-        }
+      if (order.compare(temp[i], temp[j]) <= 0) {
+          values[k++] = temp[i++];
+      } else {
+          values[k++] = temp[j++];
+      }
     }
 
     while (i <= mid) {
-        values[k++] = temp[i++];
+      values[k++] = temp[i++];
     }
 
     while (j <= right) {
-        values[k++] = temp[j++];
+      values[k++] = temp[j++];
     }
   }
 
@@ -174,11 +174,11 @@ public class BellJakeSort<T> implements Sorter<T> {
    * @param right
    */
   private void parallelMergeSort(T[] values, int left, int right) {
-      if (right - left <= 1000) {
-          mergeSort(values, left, right);
-      } else {
-          forkJoinPool.invoke(new MergeTask(values, left, right));
-      } // if/else
+    if (right - left <= 1000) {
+        mergeSort(values, left, right);
+    } else {
+        forkJoinPool.invoke(new MergeTask(values, left, right));
+    } // if/else
   } // parallelMergeSort(T[], int int)
 
   private class MergeTask extends RecursiveTask<Void> {
@@ -187,28 +187,28 @@ public class BellJakeSort<T> implements Sorter<T> {
     private final int right;
 
     public MergeTask(T[] values, int left, int right) {
-        this.values = values;
-        this.left = left;
-        this.right = right;
+      this.values = values;
+      this.left = left;
+      this.right = right;
     } // MergeTask(T[], int, int)
 
     @Override
     protected Void compute() {
-        int mid = left + (right - left) / 2;
-        MergeTask leftTask = new MergeTask(values, left, mid);
-        MergeTask rightTask = new MergeTask(values, mid + 1, right);
+      int mid = left + (right - left) / 2;
+      MergeTask leftTask = new MergeTask(values, left, mid);
+      MergeTask rightTask = new MergeTask(values, mid + 1, right);
 
-        // Fork the tasks
-        leftTask.fork();
-        rightTask.fork();
+      // Fork the tasks
+      leftTask.fork();
+      rightTask.fork();
 
-        // Wait for both sides to finish
-        leftTask.join();
-        rightTask.join();
+      // Wait for both sides to finish
+      leftTask.join();
+      rightTask.join();
 
-        // Merge results
-        merge(values, left, mid, right);
-        return null;
+      // Merge results
+      merge(values, left, mid, right);
+      return null;
     } // compute() 
   } // MergeTask
 } // class BellJakeSort

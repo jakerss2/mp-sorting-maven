@@ -58,6 +58,14 @@ public class MergeSorter<T> implements Sorter<T> {
     merge(values, 0, values.length - 1);
   } // sort(T[])
 
+  /**
+   * Main mergesort method that
+   * recursively calls the helper
+   * to give proper bounds.
+   * @param values
+   * @param left
+   * @param right
+   */
   public void merge(T[] values, int lb, int ub) {
     if (lb < ub) {
       int midpoint = lb + (ub - lb) / 2;
@@ -66,9 +74,19 @@ public class MergeSorter<T> implements Sorter<T> {
       merge(values, midpoint + 1, ub);
 
       mergeHelper(values, lb, midpoint, ub);
-    }
-  }
+    } // if
+  } // merge(T[], int, int)
 
+  /**
+   * Given an array, we move along to sides of an array
+   * and "merge" them by comparing each index of the
+   * sides of the array, and increasing the
+   * respective index.
+   * @param values
+   * @param lb
+   * @param m
+   * @param ub
+   */
   public void mergeHelper(T[] values, int lb, int m, int ub) {
     int sizeLeft = m - lb + 1;
     int sizeRight = ub - m;
@@ -77,10 +95,10 @@ public class MergeSorter<T> implements Sorter<T> {
 
     for (int i = 0; i < sizeLeft; i++) { 
       tmpLeft[i] = values[i + lb];
-    }
+    } // for
     for (int i = 0; i < sizeRight; i++) {
       tmpRight[i] = values[m + 1 + i];
-    }
+    } // for
 
     int i = 0;
     int j = 0;
@@ -92,15 +110,15 @@ public class MergeSorter<T> implements Sorter<T> {
         values[k++] = tmpLeft[i++];
       } else {
         values[k++] = tmpRight[j++];
-      }
-    }
+      } // if/else
+    } // for
 
     while (i < sizeLeft) {
       values[k++] = tmpLeft[i++];
-    }
+    } // while
 
     while (j < sizeRight) {
       values[k++] = tmpRight[j++];
-    }
-  }
+    } // while
+  } // mergeHelper(T[], int, int, int)
 } // class MergeSorter
