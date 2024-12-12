@@ -8,6 +8,7 @@ import java.util.Comparator;
  * @param <T>
  *   The types of values that are sorted.
  *
+ * @author Jacob Bell
  * @author Samuel A. Rebelsky
  */
 
@@ -55,20 +56,33 @@ public class InsertionSorter<T> implements Sorter<T> {
    */
   @Override
   public void sort(T[] values) {
-    for (int i = 1; i < values.length; i++) {
-      int j = (i - 1);
-      T obj = values[i];
-
-      while(j >= 0) {
-        int comp = order.compare(values[j], obj);
-        if (comp >= 1) {
-          values[j + 1] = values[j];
-          j--;
-        } else {
-          break;
-        } // if/else
-      } // while
-    values[j + 1] = obj;
+    for (int i = 0; i < values.length; i++) {
+      insert(values, i);
     } // for
   } // sort(T[])
+
+  /**
+   * Place the certain index of an array in its
+   * proper place in the sorted side of array.
+   *
+   * @param values
+   *  the array we are sorting
+   * @param index
+   *  the place we are inserting in the sorted side of array
+   */
+  public void insert(T[] values, int index) {
+    int j = (index - 1);
+    T obj = values[index];
+
+    while (j >= 0) {
+      int comp = order.compare(values[j], obj);
+      if (comp >= 1) {
+        values[j + 1] = values[j];
+        j--;
+      } else {
+        break;
+      } // if/else
+    } // while
+    values[j + 1] = obj;
+  } // insert(T[])
 } // class InsertionSorter
