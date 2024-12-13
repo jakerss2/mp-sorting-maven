@@ -8,6 +8,7 @@ import java.util.Comparator;
  * @param <T>
  *   The types of values that are sorted.
  *
+ * @author Jake Bell
  * @author Samuel A. Rebelsky
  */
 
@@ -55,27 +56,47 @@ public class SelectionSorter<T> implements Sorter<T> {
    */
   @Override
   public void sort(T[] values) {
-    select(values);
+    for (int i = 0; i < values.length - 1; i++) {
+      select(values, i);
+    } // for
   } // sort(T[])
 
-  public void select(T[] values) {
-    for (int i = 0; i < values.length - 1; i++) {
-      int minIndex = indexOfSmall(values, i);
+  /**
+   * Find the smallest value of the unsorted
+   * portion of the array, and put it at the
+   * correct index.
+   *
+   * @param values
+   *  The values we are sorting.
+   * @param index
+   *  Where we will swap the smallest value remaining.
+   */
+  public void select(T[] values, int index) {
+    int minIndex = indexOfSmall(values, index);
 
-      T obj = values[minIndex];
-      values[minIndex] = values[i];
-      values[i] = obj;
-    }
-  }
+    T obj = values[minIndex];
+    values[minIndex] = values[index];
+    values[index] = obj;
+  } // select(T[], int)
 
+  /**
+   * The method used to find the smallest value after start.
+   *
+   * @param values
+   *  The values we are searching through.
+   * @param start
+   *  The start of the unsorted values.
+   * @return
+   *  The index of the smallest value remaining.
+   */
   public int indexOfSmall(T[] values, int start) {
     int index = start;
     for (int j = start + 1; j < values.length; j++) {
       int comp = (order.compare(values[index], values[j]));
       if (comp >= 1) {
         index = j;
-      }
-    }
+      } // if
+    } // for
     return index;
-  }
+  } // indexOfSmall(T[], int)
 } // class SelectionSorter
