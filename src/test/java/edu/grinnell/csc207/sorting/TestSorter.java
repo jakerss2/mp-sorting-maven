@@ -223,5 +223,5 @@ public class TestSorter {
     } // for
     ArrayUtils.permute(original);
     assertSorts(expected, original, stringSorter);
-  } // permutedIntegers
+  } // stringReverseTest
 } // class TestSorter
