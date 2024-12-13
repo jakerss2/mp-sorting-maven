@@ -9,10 +9,11 @@ import java.util.Random;
  * @param <T>
  *   The types of values that are sorted.
  *
+ * @author Jake Bell
  * @author Samuel A. Rebelsky
  */
 
-public class Quicksorter<T> implements Sorter<T> {
+public class QuickSorter<T> implements Sorter<T> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
@@ -33,7 +34,7 @@ public class Quicksorter<T> implements Sorter<T> {
    *   The order in which elements in the array should be ordered
    *   after sorting.
    */
-  public Quicksorter(Comparator<? super T> comparator) {
+  public QuickSorter(Comparator<? super T> comparator) {
     this.order = comparator;
   } // Quicksorter(Comparator)
 
@@ -56,45 +57,73 @@ public class Quicksorter<T> implements Sorter<T> {
    */
   @Override
   public void sort(T[] values) {
-    quick(values, 0, values.length - 1);
+    quickSort(values, 0, values.length);
   } // sort(T[])
 
-  public void quick(T[] values, int lb, int ub) {
-    if (lb < ub) {
-      Random rand = new Random();
-      int pivot = lb + rand.nextInt(ub - lb + 1);
-      T tmp = values[pivot];
-      values[pivot] = values[ub];
-      values[ub] = tmp;
+  /**
+   * The main quicksort algorithm using partition.
+   *
+   * @param values
+   *  The values we want to sort.
+   * @param lb
+   *  The lower bound of values we look at.
+   * @param ub
+   *  The upper bound of values we look at.
+   */
+  public void quickSort(T[] values, int lb, int ub) {
+    if (ub - lb <= 1) {
+      return;
+    } // if
 
-      int[] bounds = quickHelper(values, lb, ub);
+    Random rand = new Random();
+    int pivot = lb + rand.nextInt(ub - lb);
+    T tmp = values[pivot];
+    values[pivot] = values[ub - 1];
+    values[ub - 1] = tmp;
 
-      quick(values, lb, bounds[0] - 1);
-      quick(values, bounds[1] + 1, ub);
-    }
-  }
+    int[] bounds = partition(values, lb, ub - 1);
 
-  public int[] quickHelper(T[] values, int lb, int ub) {
+    quickSort(values, lb, bounds[0]);
+    quickSort(values, bounds[1], ub);
+  } // quickSort(T[], int, int)
+
+  /**
+   * Using the DNF method, we will rearrange an array
+   * with values on the left will be less than
+   * initial ub value. Anything equal to the value at our
+   * original ub will be place after the less than values.
+   * Unprocessed values follow, then greater than.
+   *
+   * @param values
+   *  What we are rearraging.
+   * @param lb
+   *  The lower bound of the values.
+   * @param ub
+   *  The upper bound of values.
+   * @return
+   *  The index of where the less values end and index of
+   *  where greater values start.
+   */
+  public int[] partition(T[] values, int lb, int ub) {
     int left = lb;
     int same = lb;
     int right = ub;
     T pivot = values[ub];
-    
 
     while (same <= right) {
       int comp = order.compare(values[same], pivot);
       if (comp < 0) {
-          T obj = values[same];
-          values[same++] = values[left];
-          values[left++] = obj;
+        T obj = values[same];
+        values[same++] = values[left];
+        values[left++] = obj;
       } else if (comp > 0) {
         T obj = values[same];
         values[same] = values[right];
         values[right--] = obj;
       } else {
         same++;
-      }
-    }
-    return new int[] { left, right };
-  }
+      } // if/else
+    } // while
+    return new int[] {left, right + 1};
+  } // partition(T[], int, int)
 } // class Quicksorter
