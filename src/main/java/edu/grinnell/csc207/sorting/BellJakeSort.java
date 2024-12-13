@@ -8,6 +8,7 @@ import java.util.concurrent.RecursiveTask;
  * My Unique sorting algorithm which utilizes insertion and merge
  * sorting. It also uses forkJoinPool which splits the arrays
  * and allows them to be sorted at the same time(parallelization).
+ * Acknowledgement: ChatGPT was used to help make the sorting faster.
  *
  * @param <T>
  *   The types of values that are sorted.
@@ -26,10 +27,10 @@ public class BellJakeSort<T> implements Sorter<T> {
    */
   Comparator<? super T> order;
 
-  /** Typical runsize for tim sort */
+  /** Typical runsize for tim sort. */
   private static final int RUN_SIZE = 32;
 
-  /** Hold the same fjp */
+  /** Hold the same fjp. */
   private final ForkJoinPool forkJoinPool;
 
   // +--------------+------------------------------------------------
@@ -45,7 +46,7 @@ public class BellJakeSort<T> implements Sorter<T> {
    */
   public BellJakeSort(Comparator<? super T> comparator) {
     this.order = comparator;
-    this.forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());;
+    this.forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
   } // InsertionSorter(Comparator)
 
   // +---------+-----------------------------------------------------
@@ -68,15 +69,13 @@ public class BellJakeSort<T> implements Sorter<T> {
   @Override
   public void sort(T[] values) {
     int n = values.length;
-
     // Use insertion sort on small "runs" within the array
     for (int i = 0; i < n; i += RUN_SIZE) {
       int end = Math.min(i + RUN_SIZE - 1, n - 1);
       insertionSort(values, i, end);
-    }
-
+    } // for
     parallelMergeSort(values);
-} // sort([])
+  } // sort(T[])
 
 
 /**
@@ -85,13 +84,17 @@ public class BellJakeSort<T> implements Sorter<T> {
  * and place them where they go in the sorted
  * section, and shift.
  * @param values
+ *  The values we are sorting.
  * @param left
+ *  The left bound of the values we will sort.
  * @param right
+ *  The right bound of the values we will sort.
  */
   private void insertionSort(T[] values, int left, int right) {
     for (int i = left + 1; i <= right; i++) {
       T temp = values[i];
-      int low = left, high = i - 1;
+      int low = left;
+      int high = i - 1;
 
       while (low <= high) {
         int mid = low + (high - low) / 2;
@@ -102,8 +105,8 @@ public class BellJakeSort<T> implements Sorter<T> {
         } // if/else
       } // while
 
-    System.arraycopy(values, low, values, low + 1, i - low);
-    values[low] = temp;
+      System.arraycopy(values, low, values, low + 1, i - low);
+      values[low] = temp;
     } // for
   } // insertionSort(T[], int, int)
 
@@ -112,8 +115,7 @@ public class BellJakeSort<T> implements Sorter<T> {
    * recursively calls the helper
    * to give proper bounds.
    * @param values
-   * @param left
-   * @param right
+   *  The values we are sorting.
    */
   private void mergeSort(T[] values) {
     int n = values.length;
@@ -131,59 +133,83 @@ public class BellJakeSort<T> implements Sorter<T> {
 
   /**
    * Given an array, we move along to sides of an array
-   * and "merge" them by comparing each index of the 
+   * and "merge" them by comparing each index of the
    * sides of the array, and increasing the
    * respective index.
    * @param values
+   *  The values we are sorting.
+   * @param temp
+   *  The temporary array we are storing in.
    * @param left
+   *  The left bound of what we will sort.
    * @param mid
+   *  The middle of values we are sorting.
    * @param right
+   *  The right bound of what we will sort.
    */
   private void merge(T[] values, T[] temp, int left, int mid, int right) {
     System.arraycopy(values, left, temp, left, right - left + 1);
 
-    int i = left, j = mid + 1, k = left;
+    int i = left;
+    int j = mid + 1;
+    int k = left;
 
     while (i <= mid && j <= right) {
       if (order.compare(temp[i], temp[j]) <= 0) {
         values[k++] = temp[i++];
       } else {
         values[k++] = temp[j++];
-      }
-    }
+      } // if
+    } // while
 
     while (i <= mid) {
       values[k++] = temp[i++];
-    }
+    } // while
 
     while (j <= right) {
       values[k++] = temp[j++];
-    }
-  }
+    } // while
+  } // merge(T[], T[], int, int, int)
 
   /**
    * Merge sort that utilizes forkJoinPool
    * which allows multiple sortings to happen
-   * at the same time
+   * at the same time.
    * @param values
-   * @param left
-   * @param right
+   *  The values we are searching.
    */
   private void parallelMergeSort(T[] values) {
     int n = values.length;
 
     if (n <= 1000) {
-        mergeSort(values);
+      mergeSort(values);
     } else {
-        forkJoinPool.invoke(new MergeTask(values, 1, n));
+      forkJoinPool.invoke(new MergeTask(values, 1, n));
     } // if/else
-  } // parallelMergeSort(T[], int int)
+  } // parallelMergeSort(T[])
 
+  /**
+   * MergeTask used to begin the merging.
+   */
   private class MergeTask extends RecursiveTask<Void> {
+    /** The values we are sorting. */
     private final T[] values;
+
+    /** Size of how many parallelizations we are doing. */
     private final int size;
+
+    /** The size of values. */
     private final int n;
 
+    /**
+     * Initialize our MergeTask.
+     * @param values
+     *  The values we are sorting.
+     * @param size
+     *  Size of how many parallelizations we are doing.
+     * @param n
+     *  The size of values.
+     */
     public MergeTask(T[] values, int size, int n) {
       this.values = values;
       this.size = size;
@@ -193,8 +219,8 @@ public class BellJakeSort<T> implements Sorter<T> {
     @Override
     protected Void compute() {
       if (size >= n) {
-        return null;  // All merging is complete
-      }
+        return null; // All merging is complete
+      } // if
 
       // Create parallel tasks for merging subarrays
       invokeAll(new MergeTask(values, size * 2, n));
@@ -203,7 +229,7 @@ public class BellJakeSort<T> implements Sorter<T> {
         int mid = left + size - 1;
         int right = Math.min(left + 2 * size - 1, n - 1);
         merge(values, (T[]) new Object[n], left, mid, right);
-      }
+      } // for
 
       return null;
     } // compute()
