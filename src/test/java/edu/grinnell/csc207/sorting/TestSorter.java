@@ -202,4 +202,26 @@ public class TestSorter {
     Integer[] expected = { 1, 1, 1, 1, 2, 2, 2, 2 };
     assertSorts(expected, original, intSorter);
   } // manyDuplicateInt
+
+  /**
+   * Sort a medium sized reverse array.
+   */
+  @Test 
+  public void stringReverseTest() { 
+    int SIZE = 100; 
+    if (null == stringSorter) { 
+      return; 
+    } // if
+    String placeHold = "Number: ";
+    String[] original = new String[SIZE];
+    for (int i = 0; i < SIZE; i++) {
+      original[SIZE - i] = placeHold + i;
+    } // for
+    String[] expected = original.clone();
+    for (int i = 0; i < SIZE; i++) {
+      expected[i] = placeHold + i;
+    } // for
+    ArrayUtils.permute(original);
+    assertSorts(expected, original, stringSorter);
+  } // permutedIntegers
 } // class TestSorter
