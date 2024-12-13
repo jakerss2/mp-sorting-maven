@@ -8,6 +8,7 @@ import java.util.Comparator;
  * @param <T>
  *   The types of values that are sorted.
  *
+ * @author Jacob Bell
  * @author Samuel A. Rebelsky
  */
 
@@ -63,8 +64,11 @@ public class MergeSorter<T> implements Sorter<T> {
    * recursively calls the helper
    * to give proper bounds.
    * @param values
-   * @param left
-   * @param right
+   *  The values we are sorting.
+   * @param lb
+   *  The left bound of the values we are sorting.
+   * @param ub
+   *  The right bound of the values we are sorting.
    */
   public void merge(T[] values, int lb, int ub) {
     if (lb < ub) {
@@ -83,9 +87,13 @@ public class MergeSorter<T> implements Sorter<T> {
    * sides of the array, and increasing the
    * respective index.
    * @param values
+   *  The values we are sorting.
    * @param lb
+   *  The lower bound of the values we are sorting.
    * @param m
+   *  The midpoint of the values we are sorting.
    * @param ub
+   *  The upper bound of the values we are sorting.
    */
   public void mergeHelper(T[] values, int lb, int m, int ub) {
     int sizeLeft = m - lb + 1;
@@ -93,7 +101,7 @@ public class MergeSorter<T> implements Sorter<T> {
     T[] tmpLeft = (T[]) new Object[sizeLeft];
     T[] tmpRight = (T[]) new Object[sizeRight];
 
-    for (int i = 0; i < sizeLeft; i++) { 
+    for (int i = 0; i < sizeLeft; i++) {
       tmpLeft[i] = values[i + lb];
     } // for
     for (int i = 0; i < sizeRight; i++) {
